@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adaptive Card Example</title>
+    <script src="https://unpkg.com/adaptivecards@2.1.0/dist/adaptivecards.js"></script>
+    <script src="https://unpkg.com/adaptivecards-templating@1.4.0/dist/adaptivecards-templating.js"></script>
+    <script src="https://unpkg.com/markdown-it@10.0.0/dist/markdown-it.min.js"></script>
+    <style>
+        #card-div {
+            max-width: 450px;
+            margin: 24px;
+            box-shadow: rgb(0 0 0 / 10%) 0px 2px 4px, rgb(0 0 0 / 10%) 0px 0px 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="card-div"></div>
+    <script id="templatePayload" type="application/json">
+    {
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "The server ${servername} stopped at **${time}**"
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "That is ${int(formatDateTime(time,'hh')) - int(formatDateTime(utcNow(),'hh'))} hours ago"
+                    }
+                ],
+                "style": "accent",
+                "bleed": true
+            }
+        ],
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+    }
+    </script>
+    <script>
+        var templatePayload = JSON.parse(document.getElementById('templatePayload').textContent);
+
+        var context = {
+            "$root": {
+                "servername": "Carcalla",
+                "time": "2021-05-13T08:44:30.524Z"
+            }
+        };
+
+        if (templatePayload && context) {
+            var template = new ACData.Template(templatePayload);
+            var card = template.expand(context);
+
+            var adaptiveCard = new AdaptiveCards.AdaptiveCard();
+            adaptiveCard.parse(card);
+            document.getElementById('card-div').appendChild(adaptiveCard.render());
+        }
+    </script>
+</body>
+</html>
